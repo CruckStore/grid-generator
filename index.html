@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0" />
+    <title>Générateur de Grid Giveaway</title>
+    <style>
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+      html,
+      body {
+        height: 100%;
+        overflow: hidden;
+      }
+      body {
+        display: flex;
+        flex-direction: column;
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        background: linear-gradient(135deg, #2c3e50, #34495e);
+        color: #ecf0f1;
+      }
+      .controls {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding: 8px;
+        background: rgba(0, 0, 0, 0.2);
+      }
+      .controls label {
+        font-size: 1rem;
+        margin-right: 8px;
+      }
+      .controls input[type="number"] {
+        width: 60px;
+        padding: 4px;
+        border: 1px solid #ecf0f1;
+        border-radius: 4px;
+        background: rgba(236, 240, 241, 0.1);
+        color: #ecf0f1;
+        text-align: center;
+        margin-right: 12px;
+      }
+      .controls button {
+        padding: 6px 14px;
+        border: none;
+        border-radius: 4px;
+        background: #e74c3c;
+        cursor: pointer;
+        transition: background 0.3s;
+        color: #ecf0f1;
+        font-size: 1rem;
+      }
+      .controls button:hover {
+        background: #c0392b;
+      }
+      #grid {
+        flex: 1;
+        display: grid;
+        gap: 6px;
+        justify-content: center;
+        align-content: center;
+      }
+      .grid-item {
+        background: rgba(236, 240, 241, 0.2);
+        backdrop-filter: blur(4px);
+        border-radius: 4px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #ecf0f1;
+        user-select: none;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+        transition: transform 0.2s;
+      }
+      .grid-item:hover {
+        transform: scale(1.05);
+      }
+    </style>
+  </head>
+  <body>
+    <div class="controls">
+      <label for="count">Nombre de cases :</label>
+      <input
+        type="number"
+        id="count"
+        min="1"
+        value="300" />
+      <button id="generate">Générer</button>
+    </div>
+    <div id="grid"></div>
+
+    <script>
+      const headerEl = document.querySelector(".header");
+      const controlsEl = document.querySelector(".controls");
+      const gridEl = document.getElementById("grid");
+      const gap = 6;
+
+      function generateGrid(count) {
+        gridEl.innerHTML = "";
+        for (let i = 1; i <= count; i++) {
+          const cell = document.createElement("div");
+          cell.className = "grid-item";
+          cell.textContent = i;
+          gridEl.appendChild(cell);
+        }
+        updateLayout();
+      }
+
+      function updateLayout() {
+        const totalWidth = window.innerWidth;
+        const headerHeight = headerEl.offsetHeight;
+        const controlsHeight = controlsEl.offsetHeight;
+        const totalHeight = window.innerHeight - headerHeight - controlsHeight;
+        gridEl.style.height = totalHeight + "px";
+
+        const count = gridEl.children.length;
+        const cols = Math.ceil(Math.sqrt(count * (totalWidth / totalHeight)));
+        const rows = Math.ceil(count / cols);
+
+        const cellSize = Math.floor(
+          Math.min(
+            (totalWidth - gap * (cols - 1)) / cols,
+            (totalHeight - gap * (rows - 1)) / rows
+          )
+        );
+
+        gridEl.style.gridTemplateColumns = `repeat(${cols}, ${cellSize}px)`;
+        gridEl.style.gridAutoRows = `${cellSize}px`;
+        gridEl.style.padding = "0";
+
+        Array.from(gridEl.children).forEach((cell) => {
+          cell.style.fontSize = `${Math.floor(cellSize * 0.4)}px`;
+        });
+      }
+
+      document.getElementById("generate").addEventListener("click", () => {
+        const count = parseInt(document.getElementById("count").value, 10);
+        if (count > 0) generateGrid(count);
+      });
+
+      window.addEventListener("resize", updateLayout);
+
+      generateGrid(parseInt(document.getElementById("count").value, 10));
+    </script>
+  </body>
+</html>
